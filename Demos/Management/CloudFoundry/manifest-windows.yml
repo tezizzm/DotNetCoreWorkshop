@@ -1,0 +1,10 @@
+﻿---
+applications:
+- name: actuator
+  memory: 512M
+  stack: windows2012R2
+  command: .\CloudFoundry
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+  services:
+   - myMySqlService

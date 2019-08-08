@@ -1,0 +1,328 @@
+cd /
+mkdir SchwabCircuitBreakerDemo
+cd .\SchwabCircuitBreakerDemo\
+dotnet new mvc
+code .
+dotnet add package Steeltoe.Extensions.Configuration.CloudFoundryCore
+dotnet add package Steeltoe.Discovery.ClientCore
+dotnet add package Steeltoe.CircuitBreaker.HystrixCore
+dotnet add package Steeltoe.CircuitBreaker.Hystrix.MetricsStreamCore
+dotnet add package RabbitMQ.Client
+dotnet restore
+>Program.cs
+.UseCloudFoundryHosting()
+.AddCloudFoundry()
+>Startup.cs
+services.AddDiscoveryClient(Configuration);
+services.AddHystrixMetricsStream(Configuration);
+
+app.UseHystrixRequestContext();
+app.UseDiscoveryClient();
+app.UseHystrixMetricsStream();
+
+mkdir Service
+New-Item -Path .\Service\ -Name "ProductService.cs"
+>ProductService.cs
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Steeltoe.CircuitBreaker.Hystrix;
+using Steeltoe.Common.Discovery;
+
+namespace SchwabCircuitBreakerDemo.Service
+{
+    public sealed class ProductService : HystrixCommand<string[]>
+    {
+        private readonly DiscoveryHttpClientHandler _handler;
+        private readonly ILogger<ProductService> _logger;
+
+        public ProductService(IHystrixCommandOptions options, IDiscoveryClient client, ILogger<ProductService> logger) : 
+            base(options)
+        {
+            _logger = logger;
+            _handler = new DiscoveryHttpClientHandler(client);
+            IsFallbackUserDefined = true;
+        }
+
+        public async Task<string[]> RetrieveProducts()
+        {
+            _logger.LogDebug("Retrieving Products from Product Service");
+            return await ExecuteAsync();
+        }
+
+        protected override async Task<string[]> RunAsync()
+        {
+            var client = new HttpClient(_handler, false);
+            _logger.LogDebug("Processing rest api call to get products");
+            var result = await client.GetAsync("https://dotnet-core-api/api/products");
+            var products = await result.Content.ReadAsAsync<string[]>();
+            
+            foreach (var product in products)
+            {
+                Console.WriteLine(product);
+            }
+
+            return products;
+        }
+
+        protected override Task<string[]> RunFallbackAsync()
+        {
+            _logger.LogDebug("Processing products from fallback method");
+            var products = new[]
+            {
+                "Fallback Product One, Bulls Championship",
+                "Fallback Product Two, Notre Dame Football National Championship",
+                "Fallback Product Three, White Sox World Series!"
+            };
+
+            foreach (var product in products)
+            {
+                Console.WriteLine(product);
+            }
+
+            return Task.FromResult(products);
+        }
+    }
+}
+
+New-Item -Path .\Models\ -Name "City.cs" 
+>City.cs
+namespace SchwabCircuitBreakerDemo.Models
+{
+    public class City
+    {
+        public int Id { get; set; }
+
+        public string CityName { get; set; }
+    }
+}
+
+New-Item -Path .\Service\ -Name "CityService.cs"
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using SchwabCircuitBreakerDemo.Models;
+using Steeltoe.CircuitBreaker.Hystrix;
+using Steeltoe.Common.Discovery;
+
+namespace SchwabCircuitBreakerDemo.Service
+{
+    public class CityService : HystrixCommand<City>
+    {
+        private readonly DiscoveryHttpClientHandler _handler;
+        private readonly ILogger<CityService> _logger;
+
+        public CityService(IHystrixCommandOptions options, ILogger<CityService> logger, IDiscoveryClient client) :
+            base(options)
+        {
+            _logger = logger;
+            _handler = new DiscoveryHttpClientHandler(client);
+        }
+
+        public async Task<City> RetrieveCity()
+        {
+            _logger.LogDebug("Retrieving Products from Product Service");
+            return await ExecuteAsync();
+        }
+
+        protected override async Task<City> RunAsync()
+        {
+            var client = new HttpClient(_handler, false);
+            _logger.LogDebug("Processing rest API call to get random city");
+            var result = await client.GetAsync("https://DatabaseBackedWebAPI/api/cities");
+            var city = await result.Content.ReadAsAsync<City>();
+            return city;
+        }
+
+        protected override Task<City> RunFallbackAsync()
+        {
+            return Task.FromResult(new City { CityName = "Paris, France" });
+        }
+    }
+}
+
+c
+>MapService.cs
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using SchwabCircuitBreakerDemo.Models;
+using Steeltoe.CircuitBreaker.Hystrix;
+using Steeltoe.Common.Discovery;
+
+namespace SchwabCircuitBreakerDemo.Service
+{
+    public class MapService : HystrixCommand<string>
+    {
+        private readonly DiscoveryHttpClientHandler _handler;
+        private readonly ILogger<MapService> _logger;
+        public City City { get; private set; }
+
+        public MapService(IHystrixCommandOptions options, ILogger<MapService> logger, IDiscoveryClient client)
+            : base(options)
+        {
+            _logger = logger;
+            _handler = new DiscoveryHttpClientHandler(client);
+        }
+
+        public async Task<string> RetrieveCityMap(City city)
+        {
+            City = city;
+            _logger.LogDebug("Retrieving Products from Product Service");
+            return await ExecuteAsync();
+        }
+
+        protected override async Task<string> RunAsync()
+        {
+            var client = new HttpClient(_handler, false);
+            _logger.LogDebug("Processing rest API call to get map of city {City.CityName}");
+            var result = await client.GetAsync($"https://MapsAPI/api/maps/{City.CityName}");
+            return await result.Content.ReadAsStringAsync();
+        }
+
+        protected override async Task<string> RunFallbackAsync()
+        {
+            var defaultMap = @"https://maps.googleapis.com/maps/api/staticmap?center=Chicago,Illinois&zoom=14&size=400x400&key=AIzaSyCIPhhqn4eMwJiuIXYgP7q4j7dE0YSXvTo";
+            return await Task.FromResult(defaultMap);
+        }
+    }
+}
+
+>Startup.cs
+services.AddHystrixCommand<ProductService>("ProductService", Configuration);
+services.AddHystrixCommand<CityService>("CityService", Configuration);
+services.AddHystrixCommand<MapService>("MapService", Configuration);
+
+>HomeController.cs
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using SchwabCircuitBreakerDemo.Models;
+using SchwabCircuitBreakerDemo.Service;
+
+namespace SchwabCircuitBreakerDemo.Controllers
+{
+    public class HomeController : Controller
+    {
+        private readonly ProductService _productService;
+        private readonly CityService _cityService;
+        private readonly MapService _mapService;
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ProductService productService, MapService mapService, CityService cityService, ILogger<HomeController> logger)
+        {
+            _productService = productService;
+            _mapService = mapService;
+            _cityService = cityService;
+            _logger = logger;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var city = await _cityService.RetrieveCity();
+            _logger.LogDebug("Retrieved RetrieveCity");
+            ViewBag.CityName = city.CityName;
+            ViewBag.Map = await _mapService.RetrieveCityMap(city);
+            _logger.LogDebug("Retrieved RetrieveCityMap");
+            ViewData["products"] = await _productService.RetrieveProducts();
+            _logger.LogDebug("Retrieved Products");
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+    }
+}
+
+>Index.cs
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="jumbotron">
+    <div class="container">
+        <h1>Bootcamp Store</h1>
+        <h2>Welcome to the Bootcamp Store please see a listing of products below</h2>
+    </div>
+</div>
+<div class="container">
+    <h2>New Products</h2>
+    @if (ViewData["Products"] is string[] products)
+    {
+        foreach (var product in products)
+        {
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul>
+                        <li>@product</li>
+                    </ul>
+                </div>
+            </div>
+        }
+    }
+    <div class="row">
+    <div class="col-md-12">
+        <h4>Coming to a City Near You!</h4>
+        <img src="@ViewBag.Map">
+    </div>
+    </div>
+</div>
+
+>appSettings.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "spring": {
+    "application": {
+      "name": "ui"
+    },
+    "eureka": {
+      "client": {
+        "shouldRegisterWithEureka": false,
+        "shouldFetchRegistry": true
+      }
+    },
+    "hystrix": {
+      "stream": {
+        "validate_certificates": false
+      },
+      "command": {
+        "ProductService": {
+          "threadPoolKeyOverride": "ProductServiceTPool"
+        },
+        "CityService": {
+          "threadPoolKeyOverride": "CityServiceTPool"
+        },
+        "MapService": {
+          "threadPoolKeyOverride": "MapServiceTPool"
+        }
+      }
+    }
+  }
+}
+
+New-Item -Path . -Name "manifest.yml"
+>manifest.yml
+applications:
+- name: DemoUI
+buildpack: dotnet_core_buildpack
+memory: 512M
+random-route: true
+stack: cflinuxfs3
+services:
+- myDiscoveryService
+- myHystrixService

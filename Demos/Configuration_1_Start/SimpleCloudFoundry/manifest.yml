@@ -1,0 +1,9 @@
+---
+applications:
+- name: martezConfiguration
+  memory: 128M
+  buildpack: dotnet_core_buildpack
+  env:
+    ASPNETCORE_ENVIRONMENT: development
+  services:
+   - myConfigServer

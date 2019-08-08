@@ -1,0 +1,36 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCloudFoundry", "SimpleCloudFoundry\SimpleCloudFoundry.csproj", "{AFAB088C-3D0E-4103-9ED9-E31E1185546F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Debug|x64.Build.0 = Debug|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Debug|x86.Build.0 = Debug|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Release|x64.ActiveCfg = Release|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Release|x64.Build.0 = Release|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Release|x86.ActiveCfg = Release|Any CPU
+		{AFAB088C-3D0E-4103-9ED9-E31E1185546F}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AE27D29E-402B-48D4-865C-E0C8B3CEF7B8}
+	EndGlobalSection
+EndGlobal

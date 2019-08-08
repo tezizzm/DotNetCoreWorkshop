@@ -1,0 +1,1 @@
+cf create-service p-config-server standard myConfigServer -c .\config.json

@@ -1,0 +1,1 @@
+hey -c 12 -z 60s https://bootcamp-store-mk-grumpy-springhare.apps.pcfone.io

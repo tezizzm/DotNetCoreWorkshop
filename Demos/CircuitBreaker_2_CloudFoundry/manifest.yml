@@ -1,0 +1,21 @@
+﻿---
+applications:
+- name: hystrixfortuneService
+  random-route: true
+  path: .\Fortune-Teller-Service\
+  memory: 128M
+  buildpack: dotnet_core_buildpack
+  env:
+    ASPNETCORE_ENVIRONMENT: Production
+  services:
+   - myDiscoveryService
+   
+- name: hystrixFortuneUI
+  path: \Fortune-Teller-UI\
+  memory: 128M
+  buildpack: dotnet_core_buildpack
+  env:
+    ASPNETCORE_ENVIRONMENT: Production
+  services:
+    - myDiscoveryService
+    - myHystrixService

@@ -1,0 +1,21 @@
+﻿---
+applications:
+- name: fortuneService
+  random-route: true  
+  path: .\Fortune-Teller-Service\
+  memory: 128M
+  buildpack: dotnet_core_buildpack
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+  services:
+   - myDiscoveryService
+   
+- name: scaledFortuneUI
+  random-route: true
+  path: \Fortune-Teller-UI\
+  memory: 128M
+  buildpack: dotnet_core_buildpack
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+  services:
+    - myDiscoveryService

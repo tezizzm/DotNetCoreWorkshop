@@ -1,0 +1,7 @@
+---
+applications:
+- name: cloud
+  buildpack: https://github.com/cloudfoundry/dotnet-core-buildpack
+  path: .\publish
+  env:
+    ASPNETCORE_ENVIRONMENT: development

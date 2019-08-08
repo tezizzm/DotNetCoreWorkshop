@@ -1,0 +1,10 @@
+﻿---
+applications:
+- name: Actuator
+  random-route: true
+  memory: 128M
+  buildpack: dotnet_core_buildpack
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+  services:
+   - myMySqlService

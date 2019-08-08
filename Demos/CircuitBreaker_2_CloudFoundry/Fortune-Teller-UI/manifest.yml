@@ -1,0 +1,11 @@
+---
+applications:
+- name: hystrixFortuneUI
+  random-route: true
+  memory: 128M
+  buildpack: dotnet_core_buildpack
+  env:
+    ASPNETCORE_ENVIRONMENT: Production
+  services:
+    - myDiscoveryService
+    - myHystrixService

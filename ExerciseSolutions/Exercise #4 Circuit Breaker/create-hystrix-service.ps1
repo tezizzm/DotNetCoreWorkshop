@@ -1,0 +1,1 @@
+cf create-service p-circuit-breaker-dashboard standard myHystrixService

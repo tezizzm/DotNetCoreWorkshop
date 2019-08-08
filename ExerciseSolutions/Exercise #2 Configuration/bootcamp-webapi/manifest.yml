@@ -1,0 +1,12 @@
+applications:
+- name: bootcamp-api-mak
+  random-route: true
+  buildpacks:
+  - https://github.com/cloudfoundry/dotnet-core-buildpack
+  instances: 1
+  memory: 256M
+  env:
+    ASPNETCORE_ENVIRONMENT: development
+  services:
+  - products-db-mak
+  - myConfigServer

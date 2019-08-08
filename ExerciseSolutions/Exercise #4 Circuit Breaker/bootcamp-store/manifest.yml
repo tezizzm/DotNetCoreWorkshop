@@ -1,0 +1,11 @@
+applications:
+- name: bootcamp-store-mak
+  buildpacks:
+  - https://github.com/cloudfoundry/dotnet-core-buildpack
+  random-route: true
+  memory: 256M
+  env:
+   ASPNETCORE_ENVIRONMENT: development
+  services:
+  - myDiscoveryService
+  - myHystrixService

@@ -1,0 +1,38 @@
+﻿@model IList<Product>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="jumbotron">
+    <div class="container">
+        <h1>Bootcamp Store</h1>
+        <h2>Welcome to the Bootcamp Store please see a listing of products below</h2>
+    </div>
+</div>
+<div class="container">
+    <h2>Products</h2>
+    <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Inventory</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var product in Model)
+                    {
+                        <tr>
+                            <td>@product.Name</td>
+                            <td>@product.Category</td>
+                            <td>@product.Inventory</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+﻿---
+applications:
+- name: fortuneService
+  buildpack: dotnet_core_buildpack
+  env:
+    ASPNETCORE_ENVIRONMENT: Production
+  services:
+   - myDiscoveryService
