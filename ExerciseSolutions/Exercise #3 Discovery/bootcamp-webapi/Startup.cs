@@ -35,13 +35,13 @@ namespace bootcamp_webapi
         {
             var isMySqlBound = Configuration.GetServiceInfos<MySqlServiceInfo>().Any();
             services.AddDbContext<ProductContext>(options =>
-                {
-                    if (isMySqlBound)
-                        options.UseMySql(Configuration);
-                    else
-                        options.UseSqlite("DataSource=:memory:");
+            {
+                if (isMySqlBound)
+                    options.UseMySql(Configuration);
+                else
+                    options.UseSqlite("DataSource=:memory:");
 
-                }, isMySqlBound ? ServiceLifetime.Scoped : ServiceLifetime.Singleton);
+            }, isMySqlBound ? ServiceLifetime.Scoped : ServiceLifetime.Singleton);
 
             services.AddSwagger();
             services.AddDiscoveryClient(Configuration);
@@ -73,15 +73,14 @@ namespace bootcamp_webapi
                         PropertyNameHandling.CamelCase;
                     settings.PostProcess = document =>
                     {
-                        document.Info.Version = apiSettings.Version;
-                        document.Info.Title = apiSettings.Title;
+                        document.Info.Version = apiSettings?.Version;
+                        document.Info.Title = apiSettings?.Title;
                         document.Info.Description = "A simple ASP.NET Core web API";
-                        document.Schemes.Clear();
                         document.Schemes.Add(NSwag.SwaggerSchema.Https);
                     };
                     settings.SwaggerUiRoute = "";
                 });
-                
+
             app.UseDiscoveryClient();
             app.UseMvc();
         }

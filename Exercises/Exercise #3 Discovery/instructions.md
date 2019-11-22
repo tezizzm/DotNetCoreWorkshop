@@ -38,7 +38,7 @@ This exercise helps us understand how to register our microservices with the Spr
         app.UseDiscoveryClient();
         ```
 
-3. In the root directory navigate to the appSettings.json file and add an entry for eureka like the below snippet.  These settings tell Eureka to register our service instance with the Eureka Server
+3. In the root directory navigate to the appsettings.json file and add an entry for eureka like the below snippet.  These settings tell Eureka to register our service instance with the Eureka Server
 
     ```json
     "eureka": {
@@ -73,6 +73,8 @@ We now change focus to a front end application that discovers our products API m
 2. Navigate to the newly created directory using the following command: `cd bootcamp-store`
 
 3. Use the Dotnet CLI to scaffold a basic MVC application with the following command: `dotnet new mvc`.  This will create a new application with the name bootcamp-store.
+
+   ***In the bootcamp-store folder run the following command: `dotnet new globaljson --sdk-version 2.2.402`.  This command will add a global.json file with our configured SDK version to our application root.  By adding this file this will ensure the entire group is on a consistent version of the dotnet SDK.***
 
 4. Navigate to the project file and edit it to add the following nuget packages:
 

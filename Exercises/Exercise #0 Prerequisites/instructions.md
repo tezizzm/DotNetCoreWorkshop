@@ -69,11 +69,11 @@ Confirm that it installed successfully by going to a command line, and typing:
 
 .NET Core represents a modern way to build .NET apps, and here we make sure we have everything needed to build ASP.NET Core apps.
 
-***This workshop material has been developed, tested and confirmed to work with .NET Core 2.2.6, Visual Studio Code, Nuget and Powershell running on Windows 10. Other environment configurations (ie, Visual Studio 2015, 2017, 2019, Command Prompt, bash, Paket, Mac OS) are expected to and should work but have not been explicitly tested***
+***This workshop material has been developed, tested and confirmed to work with .NET Core 2.2.7, Visual Studio Code, Nuget and Powershell running on Windows 10. Other environment configurations (ie, Visual Studio 2015, 2017, 2019, Command Prompt, bash, Paket, Mac OS) are expected to and should work but have not been explicitly tested***
 
 1. Visit <https://www.microsoft.com/net/download> to download and install the latest version of the .NET Core Runtime and SDK.
 
-    ***.NET Core Version 2.1.x or later is required for this workshop. For consistency we recommend every attendee have the latest release (2.2.6 as of 7/24/2019)***
+    ***.NET Core Version 2.2.x  is required for this workshop. For consistency we recommend every attendee have the 2.2.7 [release](https://dotnet.microsoft.com/download/dotnet-core/thank-you/sdk-2.2.402-windows-x64-installer).***
 
 2. Confirm that the runtime is installed correctly by opening a command line and typing:
 

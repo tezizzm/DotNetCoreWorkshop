@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace bootcamp_webapi
 {
-
     public class ProductContext : DbContext, IProductContext
     {
         public ProductContext(DbContextOptions options) : base(options)

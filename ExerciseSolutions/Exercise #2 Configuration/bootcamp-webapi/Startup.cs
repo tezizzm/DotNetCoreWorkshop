@@ -71,10 +71,9 @@ namespace bootcamp_webapi
                         PropertyNameHandling.CamelCase;
                     settings.PostProcess = document =>
                     {
-                        document.Info.Version = apiSettings.Version;
-                        document.Info.Title = apiSettings.Title;
+                        document.Info.Version = apiSettings?.Version;
+                        document.Info.Title = apiSettings?.Title;
                         document.Info.Description = "A simple ASP.NET Core web API";
-                        document.Schemes.Clear();
                         document.Schemes.Add(NSwag.SwaggerSchema.Https);
                     };
                     settings.SwaggerUiRoute = "";

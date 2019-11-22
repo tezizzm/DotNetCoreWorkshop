@@ -7,6 +7,7 @@ applications:
   memory: 256M
   env:
     ASPNETCORE_ENVIRONMENT: development
+  #### Uncomment following two lines if service is available from the previous step
   services:
   - products-db-mak
   - myConfigServer

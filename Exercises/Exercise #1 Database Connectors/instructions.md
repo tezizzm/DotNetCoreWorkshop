@@ -16,6 +16,8 @@ In this exercise we create a Web API application that will serve as the backend 
 
 2. Navigate to the newly created directory using the following command: `cd bootcamp-webapi`
 
+    ***In the bootcamp-webapi folder run the following command: `dotnet new globaljson --sdk-version 2.2.402`.  This command will add a global.json file with our configured SDK version to our application root.  By adding this file this will ensure the entire group is on a consistent version of the dotnet SDK.***
+
 3. Use the Dotnet CLI to scaffold a basic Web API application with the following command: `dotnet new webapi`.  This will create a new application with name bootcamp-webapi.  **Note the project will take the name of the folder that the command is run from unless given a specific name**
 
 4. Now utilize the Dotnet CLI to add nuget packages to your project.  Nuget is the .NET package manager for managing external libraries.  Each command will update your project file (ending in .csproj) with the package name and version.  When restoring and publishing your project these packages will be downloaded on to the target machine.  More information about Nuget can be found [here](https://www.nuget.org/)
@@ -62,7 +64,7 @@ In this exercise we create a Web API application that will serve as the backend 
     }
     ```
 
-7. Create a file named `ProductContext.cs` that will serve as our context class that will be utilized by Entity Framework to store our in memory objects.  The class should extend DbContext, define 2 constructors, one without parameters and another which takes DbContextOptions and creates a DbSet of Products.  Finally the class will have override the OnModelCreating method.  In this method we will set up data to be seeded when we later create and execute our database migrations.  For a specific discussion on DbContext see the following [article](https://docs.microsoft.com/en-us/ef/core/miscellaneous/configuring-dbcontext) and to further look at Entity Framework Core see the following [article](https://docs.microsoft.com/en-us/ef/core/).  When complete it should have the following definition.
+7. Create a file named `ProductContext.cs` that will serve as our context class that will be utilized by Entity Framework to store seed our database.  The class should extend DbContext, define 2 constructors, one without parameters and another which takes DbContextOptions and creates a DbSet of Products.  Finally the class will override the OnModelCreating method.  In this method we will set up data to be seeded when we later create and execute our database migrations.  For a specific discussion on DbContext see the following [article](https://docs.microsoft.com/en-us/ef/core/miscellaneous/configuring-dbcontext) and to further look at Entity Framework Core see the following [article](https://docs.microsoft.com/en-us/ef/core/).  When complete it should have the following definition.
 
     ```c#
     using Microsoft.EntityFrameworkCore;
@@ -162,7 +164,7 @@ In this exercise we create a Web API application that will serve as the backend 
     }
     ```
 
-11. Navigate back to the Program.cs.  We will utilize the EnsureMigration class to apply our database migrations once the application has started up.  To do this we have the modify our main method where we set up our Web Host.  When complete the Main Method should look like the following snippet:
+11. Navigate back to the Program.cs.  We will utilize the EnsureMigration class to apply our database migrations once the application has started up.  To do this we have to modify our main method where we set up our Web Host.  When complete the Main Method should look like the following snippet:
 
     ```c#
     IWebHost webHost = CreateWebHostBuilder(args).Build();
@@ -170,7 +172,7 @@ In this exercise we create a Web API application that will serve as the backend 
     webHost.Run();
     ```
 
-12. We must now create the actual migrations themselves.  To do this we run the command `dotnet ef migrations add InitialCreation` which will create a folder named Migrations in our solution.  This folder will hold the initial migration files that create our database based on the definition of our Product context and entity class.  For further reading on [creating migrations](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#create-a-migration)
+12. We must now create the actual migrations themselves.  To do this we run the command `dotnet ef migrations add InitialCreation` which will create a folder named Migrations in our solution.  This folder will hold the initial migration files that create our database based on the definition of our Product context and entity class.  For further reading on creating migrations [see](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#create-a-migration)
 
 13. A controller is used to define and group a set of actions which are methods that handle incoming requests.  For an in depth view of ASP.NET Core MVC [see](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview?view=aspnetcore-2.1) and for a Controller specific discussion [see](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/actions?view=aspnetcore-2.1).  In the controllers folder create a new class and name it `ProductsController.cs` and then paste the following contents into the file:
 
@@ -209,14 +211,14 @@ In this exercise we create a Web API application that will serve as the backend 
     ```json
     "spring": {
       "application": {
-        "name": "dotnet-core-api-{initials}"
+        "name": "bootcamp-api-{initials}"
       }
     }
     ```
 
 15. In this step we will create our MySql database provided we have the capability to do so in the target environment.  Recall, from earlier exercises, if there is no bound MySql service then we use the in memory database and can safely ***skip*** this step.
 
-    **In the following command, the service name and type may be different depending on platform/operator configuration.  Run the following command `cf marketplace ` to find the specific instance name and play for your platforms installation of MySql.  Once again take note of and replace the *{Initials}* placeholder in the command.**
+    **In the following command, the service name and type may be different depending on platform/operator configuration.  Run the following command `cf marketplace` to find the specific instance name and plan for your platforms installation of MySql.  Once again take note of and replace the *{Initials}* placeholder in the command.**
 
     ```powershell
     cf create-service p.mysql db-small products-db-{Initials}
@@ -240,5 +242,7 @@ In this exercise we create a Web API application that will serve as the backend 
     ```
 
 17. Run the cf push command to build, stage and run your application on PCF.  Ensure you are in the same directory as your manifest file and type `cf push`.
+
+    ***The operation to create the MySql instance can be timely.  If you attempt to push the application while the service is still being created, you will see errors indicating that an operation on the service is pending.***
 
 18. Once the `cf push` command has completed navigate to the given application url at which point you will see a 401 Not Found Status. This is expected since we haven't configured a default route and will be updated in the next lab.  If you navigate to the api/products path you should see a json array of products that are pulled from the backend store.

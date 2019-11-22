@@ -35,8 +35,10 @@ namespace bootcamp_store
             });
 
             services.AddDiscoveryClient(Configuration);
+
             services.AddHystrixCommand<ProductService>("ProductService", Configuration);
             services.AddHystrixMetricsStream(Configuration);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -55,11 +57,13 @@ namespace bootcamp_store
             }
 
             app.UseHystrixRequestContext();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseDiscoveryClient();
+
             app.UseHystrixMetricsStream();
 
             app.UseMvc(routes =>

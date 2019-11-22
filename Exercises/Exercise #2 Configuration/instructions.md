@@ -99,8 +99,8 @@ In this exercise we explore how Configuration Server pulls configuration from a 
                     PropertyNameHandling.CamelCase;
                 settings.PostProcess = document =>
                 {
-                    document.Info.Version = apiSettings.Version;
-                    document.Info.Title = apiSettings.Title;
+                    document.Info.Version = apiSettings?.Version;
+                    document.Info.Title = apiSettings?.Title;
                     document.Info.Description = "A simple ASP.NET Core web API";
                     document.Schemes.Clear();
                     document.Schemes.Add(NSwag.SwaggerSchema.Https);
@@ -154,7 +154,7 @@ In this exercise we explore how Configuration Server pulls configuration from a 
 
     ```yml
     applications:
-   - name: dotnet-core-api-{initials}
+   - name: bootcamp-api-{initials}
      random-route: true
      buildpacks:
      - https://github.com/cloudfoundry/dotnet-core-buildpack
