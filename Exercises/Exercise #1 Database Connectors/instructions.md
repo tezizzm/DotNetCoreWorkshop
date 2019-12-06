@@ -64,7 +64,7 @@ In this exercise we create a Web API application that will serve as the backend 
     }
     ```
 
-7. Create a file named `ProductContext.cs` that will serve as our context class that will be utilized by Entity Framework to store seed our database.  The class should extend DbContext, define 2 constructors, one without parameters and another which takes DbContextOptions and creates a DbSet of Products.  Finally the class will override the OnModelCreating method.  In this method we will set up data to be seeded when we later create and execute our database migrations.  For a specific discussion on DbContext see the following [article](https://docs.microsoft.com/en-us/ef/core/miscellaneous/configuring-dbcontext) and to further look at Entity Framework Core see the following [article](https://docs.microsoft.com/en-us/ef/core/).  When complete it should have the following definition.
+7. Create a file named `ProductContext.cs` that will serve as our context class that will be utilized by Entity Framework to seed our database.  The class should extend DbContext, define 2 constructors, one without parameters and another which takes DbContextOptions and creates a DbSet of Products.  Finally the class will override the OnModelCreating method.  In this method we will set up data to be seeded when we later create and execute our database migrations.  For a specific discussion on DbContext see the following [article](https://docs.microsoft.com/en-us/ef/core/miscellaneous/configuring-dbcontext) and to further look at Entity Framework Core see the following [article](https://docs.microsoft.com/en-us/ef/core/).  When complete it should have the following definition.
 
     ```c#
     using Microsoft.EntityFrameworkCore;
@@ -139,7 +139,7 @@ In this exercise we create a Web API application that will serve as the backend 
         }, isMySqlBound ? ServiceLifetime.Scoped : ServiceLifetime.Singleton);
         ```
 
-10. Database migrations allow us to keep our database in sync without our model.  Create a file called `EnsureMigration.cs`.  We will utilize this class when we set up our middleware pipeline to make sure all Entity Framework Migrations have been executed.  The class should have the following definition.  For a discussion on Entity Framework Migrations see the following [article](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
+10. Database migrations allow us to keep our database schema in sync with our model.  Create a file called `EnsureMigration.cs`.  We will utilize this class when we set up our middleware pipeline to make sure all Entity Framework Migrations have been executed.  The class should have the following definition.  For a discussion on Entity Framework Migrations see the following [article](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
 
     ```c#
     using System.Data.Common;
