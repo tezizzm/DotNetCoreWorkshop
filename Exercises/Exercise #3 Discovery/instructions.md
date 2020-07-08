@@ -15,10 +15,10 @@ This exercise helps us understand how to register our microservices with the Spr
 1. Return back to your `bootcamp-webapi` project root and find the project file.  We will add the following nuget package:
 
     ```powershell
-    dotnet add package Steeltoe.Discovery.ClientCore --version 2.2.0
+    dotnet add package Steeltoe.Discovery.ClientCore --version 2.4.4
     ```
 
-2. Navigate to the Startup class and make the following edits:
+2. Navigate to the Program class and make the following edits:
 
    1. Set the following using statements:
 
@@ -26,16 +26,10 @@ This exercise helps us understand how to register our microservices with the Spr
         using Steeltoe.Discovery.Client;
         ```
 
-   2. In the ConfigureServices method use an extension method to add the discovery client to the DI Container with the following line of code.  This extension methods adds the Discovery Services to the service container.
+   2. In the CreateHostBuilder method add the following line before the `webBuilder.UseStartup<Startup>();` call to configure the service discovery client
 
         ```c#
-        services.AddDiscoveryClient(Configuration);
-        ```
-
-   3. In the Configure method add the discovery client to the middleware pipeline by adding the following code snippet.  This code configures the pipeline for the discovery client.
-
-        ```c#
-        app.UseDiscoveryClient();
+        webBuilder.AddDiscoveryClient();
         ```
 
 3. In the root directory navigate to the appsettings.json file and add an entry for eureka like the below snippet.  These settings tell Eureka to register our service instance with the Eureka Server
@@ -74,50 +68,30 @@ We now change focus to a front end application that discovers our products API m
 
 3. Use the Dotnet CLI to scaffold a basic MVC application with the following command: `dotnet new mvc`.  This will create a new application with the name bootcamp-store.
 
-   ***In the bootcamp-store folder run the following command: `dotnet new globaljson --sdk-version 2.2.402`.  This command will add a global.json file with our configured SDK version to our application root.  By adding this file this will ensure the entire group is on a consistent version of the dotnet SDK.***
+   ***If you are running a newer version of the .NET CORE runtime, run the following command: `dotnet new globaljson --sdk-version 3.1.202`.  This command will add a global.json file with our configured SDK version to our application root.  By adding this file this will ensure the entire group is on a consistent version of the dotnet SDK.***
 
 4. Navigate to the project file and edit it to add the following nuget packages:
 
     ```powershell
-    dotnet add package Steeltoe.Extensions.Configuration.CloudFoundryCore --version 2.2.0
-    dotnet add package Steeltoe.Discovery.ClientCore --version 2.2.0
+    dotnet add package Steeltoe.Extensions.Configuration.CloudFoundryCore --version 2.4.4
+    dotnet add package Steeltoe.Discovery.ClientCore --version 2.4.4
     ```
 
-5. In the Program.cs class add the following using statement and edit the CreateWebHostBuilder method in the following way.  Notice the extension method AddCloudFoundry.  It is used to add the [VCAP variables](https://docs.run.pivotal.io/devguide/deploy-apps/environment-variable.html) to the configuration root.
+5. Edit the Program.cs class adding the following using statements
 
     ```c#
+    using Steeltoe.Discovery.Client;
     using Steeltoe.Extensions.Configuration.CloudFoundry;
     ```
 
+    Above the `webBuilder.UseStartup<Startup>();` line add the following lines to configure the discovery client:
+
     ```c#
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        WebHost.CreateDefaultBuilder(args)
-            .UseCloudFoundryHosting(5555)
-            .AddCloudFoundry()
-            .UseStartup<Startup>();
+    webBuilder.AddServiceDiscovery();
+    webBuilder.AddCloudFoundry();
     ```
 
-6. Navigate to the Startup class and make the following edits:
-
-   1. Set the using statement:
-
-        ```c#
-        using Steeltoe.Discovery.Client;
-        ```
-
-   2. In the ConfigureServices method use an extension method to add the discovery client to the DI Container with the following line of code.
-
-        ```c#
-        services.AddDiscoveryClient(Configuration);
-        ```
-
-   3. In the Configure method add the following code to configure the discovery client middleware.
-
-        ```c#
-        app.UseDiscoveryClient();
-        ```
-
-7. Create a file named Product.cs that will serve as the model class that represents our store's catalog of products.  The class should have four fields: Id (long), Category (string), Name (string) and Inventory (int).  When complete the class should have the following definition:
+6. Create a file named Product.cs that will serve as the model class that represents our store's catalog of products.  The class should have four fields: Id (long), Category (string), Name (string) and Inventory (int).  When complete the class should have the following definition:
 
     ```c#
     namespace bootcamp_store
@@ -132,7 +106,7 @@ We now change focus to a front end application that discovers our products API m
     }
     ```
 
-8. Edit the HomeController.cs class to retrieve our products from the API.  ***Please take note of the {initials} placeholder and adjust accordingly to match your backend api microservice URL***. First add the appropriate using statements to bring in namespace references.  Then notice the `DiscoveryHttpClientHandler` property.  It maps our call to a discovered service instance and then completes the service request.  Once the request is complete we log the results and pass the data on to our view for display.  In this case the view is an MVC view, you can read more about views [here](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/overview?view=aspnetcore-2.1).  Once complete the file should look like the following:
+7. Edit the HomeController.cs class to retrieve our products from the API.  ***Please take note of the {initials} placeholder and adjust accordingly to match your backend api microservice URL***. First add the appropriate using statements to bring in namespace references.  Then notice the `DiscoveryHttpClientHandler` property.  It maps our call to a discovered service instance and then completes the service request.  Once the request is complete we log the results and pass the data on to our view for display.  In this case the view is an MVC view, you can read more about views [here](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/overview?view=aspnetcore-3.1).  Once complete the file should look like the following:
 
     ```c#
     using System;
@@ -177,7 +151,7 @@ We now change focus to a front end application that discovers our products API m
     }
     ```
 
-9. Navigate to the views folder and edit the View file named Index.cshtml file to match the below snippet.  This file uses a mix of html and Razor syntax to iterate over and display the products returned from the Products API.  You can read about Razor Syntax [here](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor?view=aspnetcore-2.1)
+8. Navigate to the views folder and edit the View file named Index.cshtml file to match the below snippet.  This file uses a mix of html and Razor syntax to iterate over and display the products returned from the Products API.  You can read about Razor Syntax [here](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor?view=aspnetcore-3.1)
 
     ```c#
     @model IList<Product>
@@ -220,30 +194,30 @@ We now change focus to a front end application that discovers our products API m
     </div>
     ```
 
-10. In the root directory navigate to the appsettings.json file and add an entry for eureka like follows.  Notice since we are consuming the service we do not register with Eureka.
+9. In the root directory navigate to the appsettings.json file and add an entry for eureka like follows.  Notice since we are consuming the service we do not register with Eureka.
 
     ```json
     "spring": {
       "application": {
         "name" : "bootcamp-store-{initials}"
-      },
-      "eureka": {
-        "client": {
-            "shouldRegisterWithEureka": false,
-            "shouldFetchRegistry": true,
-            "validateCertificates": false
-        }
+      }
+    },
+    "eureka": {
+      "client": {
+        "shouldRegisterWithEureka": false,
+        "shouldFetchRegistry": true,
+        "validateCertificates": false
       }
     }
     ```
 
-11. You are ready to now “push” your application.  Create a file at the root of your application name it manifest.yml and edit it as follows, be sure to once again take note of the ***{initials}*** placeholder:  **Note due to formatting issues simply copying the below manifest file may produce errors due to the nature of yaml formatting.  Use the CloudFoundry extension recommend in exercise 1 to assist in the correct formatting**
+10. You are ready to now “push” your application.  Create a file at the root of your application name it manifest.yml and edit it as follows, be sure to once again take note of the ***{initials}*** placeholder:  **Note due to formatting issues simply copying the below manifest file may produce errors due to the nature of yaml formatting.  Use the CloudFoundry extension recommend in exercise 1 to assist in the correct formatting**
 
     ```yml
     applications:
     - name: bootcamp-store-{initials}
       buildpacks:
-      - https://github.com/cloudfoundry/dotnet-core-buildpack
+      - https://github.com/cloudfoundry/dotnet-core-buildpack#v2.3.11
       random-route: true
       memory: 256M
       env:
@@ -252,6 +226,6 @@ We now change focus to a front end application that discovers our products API m
       - myDiscoveryService
     ```
 
-12. Run the cf push command to build, stage and run your application on PCF.  Ensure you are in the same directory as your manifest file and type `cf push`.
+11. Run the cf push command to build, stage and run your application on PCF.  Ensure you are in the same directory as your manifest file and type `cf push`.
 
-13. Once the command has completed, navigate to the url to see the home page with products listed.
+12. Once the command has completed, navigate to the url to see the home page with products listed.

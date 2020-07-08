@@ -6,7 +6,7 @@ Explore Steeltoe Connectors by connecting to an external persistence store.
 
 ## Expected Results
 
-Create our backed microservice, a Web API application, bind it to a persistent store and utilize the Steeltoe connectors to discover and connect the Web API to the persistent store.
+When this exercise is complete we will have created our backend microservice, bound it to a persistent store and utilized the Steeltoe connectors to discover and connect the Web API to the persistent store.
 
 ## Introduction
 
@@ -16,7 +16,7 @@ In this exercise we create a Web API application that will serve as the backend 
 
 2. Navigate to the newly created directory using the following command: `cd bootcamp-webapi`
 
-    ***In the bootcamp-webapi folder run the following command: `dotnet new globaljson --sdk-version 2.2.402`.  This command will add a global.json file with our configured SDK version to our application root.  By adding this file this will ensure the entire group is on a consistent version of the dotnet SDK.***
+    ***If you are running a newer version of the .NET CORE runtime, run the following command: `dotnet new globaljson --sdk-version 3.1.202`.  This command will add a global.json file with our configured SDK version to our application root.  By adding this file this will ensure the entire group is on a consistent version of the dotnet SDK.***
 
 3. Use the Dotnet CLI to scaffold a basic Web API application with the following command: `dotnet new webapi`.  This will create a new application with name bootcamp-webapi.  **Note the project will take the name of the folder that the command is run from unless given a specific name**
 
@@ -24,30 +24,38 @@ In this exercise we create a Web API application that will serve as the backend 
 
     ```powershell
 
-    dotnet add package Pomelo.EntityFrameworkCore.MySql --version 2.2.0
+    dotnet add package Pomelo.EntityFrameworkCore.MySql --version 3.1.1
 
-    dotnet add package Steeltoe.CloudFoundry.ConnectorCore --version 2.2.0
+    dotnet add package Steeltoe.CloudFoundry.ConnectorCore --version 2.4.4
 
-    dotnet add package Steeltoe.CloudFoundry.Connector.EFCore --version 2.2.0
+    dotnet add package Steeltoe.CloudFoundry.Connector.EFCore --version 2.4.4
 
-    dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 2.2.6
+    dotnet add package Steeltoe.Common.Hosting --version 2.4.4
+
+    dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 3.1.4
+
+    dotnet add package Microsoft.EntityFrameworkCore.Design --version 3.1.4
     ```
 
 5. In the Program.cs class add the following using statement and edit the CreateWebHostBuilder method in the following way.  The using statement allows us to use types of a given namespace without fully qualifying a given type [see](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/using-directive) for information on the c# using statement.
 
     ```c#
     using Steeltoe.Extensions.Configuration.CloudFoundry;
+    using Steeltoe.Common.Hosting;
     ```
 
     ```c#
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        WebHost.CreateDefaultBuilder(args)
-            .UseCloudFoundryHosting()
-            .AddCloudFoundry()
-            .UseStartup<Startup>();
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseCloudHosting();
+                webBuilder.AddCloudFoundry();
+                webBuilder.UseStartup<Startup>();
+            });
     ```
 
-    **Take note of the UseCloudFoundryHosting which is an extension that allows us to listen on a configured port.**
+    **Take note of the UseCloudHosting which is an extension that allows us to listen on a configured port.**
 
 6. Create a file named `Product.cs` that will serve as the entity class that represents our store's catalog of products.  The class should have four fields: Id (long), Category (string), Name (string) and Inventory (int).  When complete the class should have the following definition:
 
@@ -114,7 +122,7 @@ In this exercise we create a Web API application that will serve as the backend 
     }
     ```
 
-9. Navigate to the Startup class and edit the file as follows: 
+9. Navigate to the Startup class and edit the file as follows:
 
    1. set the following using statements:
 
@@ -125,7 +133,7 @@ In this exercise we create a Web API application that will serve as the backend 
         using Steeltoe.CloudFoundry.Connector.Services;
         ```
 
-   2. The Startup.ConfigureServices method is responsible for defining the services the app uses.  In the ConfigureServices method use the following code snippet to add the database context class and utilize the Steeltoe connector.  **Note the if else statement, this is where we determine if our application is bound to a MySql instance and register the corresponding configuration.**  For a in depth look at dependency injection in ASP.NET Core see the following [article](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.1)
+   2. The Startup.ConfigureServices method is responsible for defining the services the app uses.  In the ConfigureServices method use the following code snippet to add the database context class and utilize the Steeltoe connector.  **Note the if else statement, this is where we determine if our application is bound to a MySql instance and register the corresponding configuration.**  For a in depth look at dependency injection in ASP.NET Core see the following [article](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-3.1)
 
         ```c#
         var isMySqlBound = Configuration.GetServiceInfos<MySqlServiceInfo>().Any();
@@ -143,14 +151,14 @@ In this exercise we create a Web API application that will serve as the backend 
 
     ```c#
     using System.Data.Common;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
 
     public static class EnsureMigrations
     {
         static DbConnection _connection;
-        public static void EnsureMigrationOfContext<T>(this IWebHost webHost) where T : DbContext
+        public static void EnsureMigrationOfContext<T>(this IHost webHost) where T : DbContext
         {
             using (var scope = webHost.Services.CreateScope())
             using (var serviceScope = scope.ServiceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -167,14 +175,35 @@ In this exercise we create a Web API application that will serve as the backend 
 11. Navigate back to the Program.cs.  We will utilize the EnsureMigration class to apply our database migrations once the application has started up.  To do this we have to modify our main method where we set up our Web Host.  When complete the Main Method should look like the following snippet:
 
     ```c#
-    IWebHost webHost = CreateWebHostBuilder(args).Build();
-    webHost.EnsureMigrationOfContext<ProductContext>();
-    webHost.Run();
+    IHost host = CreateHostBuilder(args).Build();
+    host.EnsureMigrationOfContext<ProductContext>();
+    host.Run();
     ```
 
-12. We must now create the actual migrations themselves.  To do this we run the command `dotnet ef migrations add InitialCreation` which will create a folder named Migrations in our solution.  This folder will hold the initial migration files that create our database based on the definition of our Product context and entity class.  For further reading on creating migrations [see](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#create-a-migration)
+12. We must now create a factory class so our design time tools (Entity Framework CLI) know how to instantiate our Product Context.  For a discussion see the following [article](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation)
 
-13. A controller is used to define and group a set of actions which are methods that handle incoming requests.  For an in depth view of ASP.NET Core MVC [see](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview?view=aspnetcore-2.1) and for a Controller specific discussion [see](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/actions?view=aspnetcore-2.1).  In the controllers folder create a new class and name it `ProductsController.cs` and then paste the following contents into the file:
+    ```c#
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Design;
+
+    namespace bootcamp_webapi
+    {
+        public class ProductFactory : IDesignTimeDbContextFactory<ProductContext>
+        {
+            public ProductContext CreateDbContext(string[] args)
+            {
+                var optionsBuilder = new DbContextOptionsBuilder<ProductContext>();
+                optionsBuilder.UseSqlite("DataSource=:memory:");
+
+                return new ProductContext(optionsBuilder.Options);
+            }
+        }
+    }
+    ```
+
+13. We must now create the actual migrations themselves.  To do this we run the command `dotnet ef migrations add InitialCreation` which will create a folder named Migrations in our solution.  This folder will hold the initial migration files that create our database based on the definition of our Product context and entity class.  For further reading on creating migrations [see](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#create-a-migration).  *Note if you get this error message `An error occurred while accessing the Microsoft.Extensions.Hosting services. Continuing without the application service provider. Error: Could not parse the JSON file.` please ignore it, this may be a EF CLI bug and I am currently investigating.  This CLI error message will not affect your generated migrations in any way.*
+
+14. A controller is used to define and group a set of actions which are methods that handle incoming requests.  For an in depth view of ASP.NET Core MVC [see](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview?view=aspnetcore-3.1) and for a Controller specific discussion [see](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/actions?view=aspnetcore-3.1).  In the controllers folder create a new class and name it `ProductsController.cs` and then paste the following contents into the file:
 
     ```c#
     using System;
@@ -206,7 +235,7 @@ In this exercise we create a Web API application that will serve as the backend 
     }
     ```
 
-14. In the root directory navigate to the appsettings.json file and add an entry for spring like the below snippet.  **Take note of *{Initials}* placeholder in the configuration file and replace with yor initials accordingly.  This will avoid conflicts if the workshop attendee applications are targeting the same space**
+15. In the root directory navigate to the appsettings.json file and add an entry for spring like the below snippet.  **Take note of *{Initials}* placeholder in the configuration file and replace with yor initials accordingly.  This will avoid conflicts if the workshop attendee applications are targeting the same space**
 
     ```json
     "spring": {
@@ -216,7 +245,7 @@ In this exercise we create a Web API application that will serve as the backend 
     }
     ```
 
-15. In this step we will create our MySql database provided we have the capability to do so in the target environment.  Recall, from earlier exercises, if there is no bound MySql service then we use the in memory database and can safely ***skip*** this step.
+16. In this step we will create our MySql database provided we have the capability to do so in the target environment.  Recall, from earlier exercises, if there is no bound MySql service then we use the in memory database and can safely ***skip*** this step.
 
     **In the following command, the service name and type may be different depending on platform/operator configuration.  Run the following command `cf marketplace` to find the specific instance name and plan for your platforms installation of MySql.  Once again take note of and replace the *{Initials}* placeholder in the command.**
 
@@ -224,14 +253,14 @@ In this exercise we create a Web API application that will serve as the backend 
     cf create-service p.mysql db-small products-db-{Initials}
     ```
 
-16. You are ready to now “push” your application.  Create a file at the root of your application name it manifest.yml and edit it to match the snippet below.  The settings in this file instruct the cloud foundry cli how to stage and deploy your application.  **Note due to formatting issues simply copying the below manifest file MAY produce errors due to the nature of yaml formatting.  Use the CloudFoundry extension recommend in exercise 0 to assist in the correct formatting.  Once again take note of and replace the *{Initials}* placeholder in the command.**
+17. You are ready to now “push” your application.  Create a file at the root of your application name it manifest.yml and edit it to match the snippet below.  The settings in this file instruct the cloud foundry cli how to stage and deploy your application.  **Note due to formatting issues simply copying the below manifest file MAY produce errors due to the nature of yaml formatting.  Use the CloudFoundry extension recommend in exercise 0 to assist in the correct formatting.  Once again take note of and replace the *{Initials}* placeholder in the command.**
 
     ```yml
     applications:
     - name: bootcamp-api-{initials}
       random-route: true
       buildpacks:
-      - https://github.com/cloudfoundry/dotnet-core-buildpack
+      - https://github.com/cloudfoundry/dotnet-core-buildpack#v2.3.11
       instances: 1
       memory: 256M
       env:
@@ -241,8 +270,8 @@ In this exercise we create a Web API application that will serve as the backend 
       #- products-db-{initials}
     ```
 
-17. Run the cf push command to build, stage and run your application on PCF.  Ensure you are in the same directory as your manifest file and type `cf push`.
+18. Run the cf push command to build, stage and run your application on PCF.  Ensure you are in the same directory as your manifest file and type `cf push`.
 
     ***The operation to create the MySql instance can be timely.  If you attempt to push the application while the service is still being created, you will see errors indicating that an operation on the service is pending.***
 
-18. Once the `cf push` command has completed navigate to the given application url at which point you will see a 401 Not Found Status. This is expected since we haven't configured a default route and will be updated in the next lab.  If you navigate to the api/products path you should see a json array of products that are pulled from the backend store.
+19. Once the `cf push` command has completed navigate to the given application url at which point you will see a 401 Not Found Status. This is expected since we haven't configured a default route and will be updated in the next lab.  If you navigate to the api/products path you should see a json array of products that are pulled from the backend store.

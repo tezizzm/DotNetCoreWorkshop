@@ -15,9 +15,9 @@ This exercise helps us understand how to wrap our external calls in Hystrix Comm
 1. Return back to your `bootcamp-store` project root and find the project file.  We will add the following nuget package:
 
     ```powerhsell
-    dotnet add package RabbitMQ.Client --version 5.1.0
-    dotnet add package Steeltoe.CircuitBreaker.Hystrix.MetricsStreamCore --version 2.2.0
-    dotnet add package Steeltoe.CircuitBreaker.HystrixCore --version 2.2.0
+    dotnet add package RabbitMQ.Client --version 5.2.0
+    dotnet add package Steeltoe.CircuitBreaker.Hystrix.MetricsStreamCore --version 2.4.4
+    dotnet add package Steeltoe.CircuitBreaker.HystrixCore --version 2.4.4
     ```
 
 2. In the root of the project create a file called ProductService.cs with the below implementation.  This class will act as an abstraction to our product retrieval from our products API.  The logic for retrieving products has been moved to our RunAsync method and there is now a method to return placeholder values from the RunFallbackAsync method in cases of failures.
@@ -32,7 +32,7 @@ This exercise helps us understand how to wrap our external calls in Hystrix Comm
     using Steeltoe.CircuitBreaker.Hystrix;
     using Steeltoe.Common.Discovery;
 
-    namespace bootcamp_store.Service
+    namespace bootcamp_store
     {
         public sealed class ProductService : HystrixCommand<IList<Product>>
         {
@@ -57,7 +57,7 @@ This exercise helps us understand how to wrap our external calls in Hystrix Comm
             {
                 var client = new HttpClient(_handler, false);
                 _logger.LogDebug("Processing rest api call to get products");
-                var jsonString = await client.GetStringAsync("https://bootcamp-api-mk/api/products");
+                var jsonString = await client.GetStringAsync("https://bootcamp-api-{initials}/api/products");
                 var products = JsonConvert.DeserializeObject<IList<Product>>(jsonString);
 
                 foreach (var product in products)
@@ -97,7 +97,6 @@ This exercise helps us understand how to wrap our external calls in Hystrix Comm
 
         ```c#
         using Steeltoe.CircuitBreaker.Hystrix;
-        using bootcamp_store.Service;
         ```
 
    2. In the ConfigureServices method use an extension method to add the service class and Hystrix metrics stream to the DI Container with the following lines of code.
@@ -138,7 +137,6 @@ This exercise helps us understand how to wrap our external calls in Hystrix Comm
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using bootcamp_store.Models;
-    using bootcamp_store.Service;
     using Microsoft.Extensions.Logging;
 
     namespace bootcamp_store.Controllers
@@ -180,7 +178,7 @@ This exercise helps us understand how to wrap our external calls in Hystrix Comm
 7. Navigate to the manifest.yml file and in the services section add an entry to bind the application to the newly created instance of the Hystrix Service.
 
     ```yml
-        - myHystrixService
+    - myHystrixService
     ```
 
 8. Run the cf push command to build, stage and run your application on PCF.  Ensure you are in the same directory as your manifest file and type `cf push`.
