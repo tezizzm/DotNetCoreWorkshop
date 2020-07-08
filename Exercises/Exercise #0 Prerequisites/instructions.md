@@ -110,7 +110,7 @@ Confirm that it installed successfully by going to a command line, and typing:
 During this workshop we will create projects that access external libraries.  Our package manager of choice is nuget.  If you do not have access to [Official Nuget Server API](https://api.nuget.org/v3/index.json) please gather these libraries and store them locally or in your team's package manager (local Nuget server, Artifactory, etc).  The libraries we will consume are:
 
 |Libraries|Version|
-| ------------- |:-------------:| -----:|
+| ------------- |-------------|
 |Pomelo.EntityFrameworkCore.MySql|3.1.1|
 |Steeltoe.CloudFoundry.ConnectorCore|2.4.4|
 |Steeltoe.CloudFoundry.Connector.EFCore|2.4.4|
