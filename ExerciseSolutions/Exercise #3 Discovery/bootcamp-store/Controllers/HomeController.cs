@@ -22,7 +22,7 @@ namespace bootcamp_store.Controllers
         public async Task<IActionResult> Index()
         {
             var client = new HttpClient(_handler, true);
-            var jsonString = await client.GetStringAsync("https://BOOTCAMP-API-MAK/api/products");
+            var jsonString = await client.GetStringAsync("https://bootcamp-api-mk/api/products");
             var products = JsonConvert.DeserializeObject<IList<Product>>(jsonString);
             foreach (var product in products)
             {

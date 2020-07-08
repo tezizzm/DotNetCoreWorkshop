@@ -21,10 +21,11 @@ In this exercise we explore how Configuration Server pulls configuration from a 
 
 2. Edit the Program.cs class.
 
-   1. Remove the following using statement:
+   1. Add the following using statement:
 
         ```c#
-        using Steeltoe.Extensions.Configuration.CloudFoundry;
+        using Microsoft.Extensions.DependencyInjection;
+        using Steeltoe.Extensions.Configuration.ConfigServer;
         ```
 
    2. Create a method to configure the LogBuilder and edit the CreateWebHostBuilder method to utilize the extension method to add Config Server:
@@ -34,7 +35,6 @@ In this exercise we explore how Configuration Server pulls configuration from a 
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseCloudHosting();
                     webBuilder.AddConfigServer(GetLoggerFactory());
                     webBuilder.UseStartup<Startup>();
                 });

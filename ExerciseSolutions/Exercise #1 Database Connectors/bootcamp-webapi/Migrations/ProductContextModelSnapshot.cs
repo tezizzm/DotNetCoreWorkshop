@@ -13,18 +13,22 @@ namespace bootcamp_webapi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+                .HasAnnotation("ProductVersion", "3.1.4");
 
             modelBuilder.Entity("bootcamp_webapi.Product", b =>
                 {
                     b.Property<long>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("Category");
+                    b.Property<string>("Category")
+                        .HasColumnType("TEXT");
 
-                    b.Property<int>("Inventory");
+                    b.Property<int>("Inventory")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 

@@ -1,14 +1,14 @@
 applications:
-- name: bootcamp-api-mak
+- name: bootcamp-api-mk
   random-route: true
   buildpacks:
-  - https://github.com/cloudfoundry/dotnet-core-buildpack
+  - https://github.com/cloudfoundry/dotnet-core-buildpack#v2.3.11
   instances: 1
   memory: 256M
   env:
     ASPNETCORE_ENVIRONMENT: development
   #### Uncomment following two lines if service is available from the previous step
   services:
-  - products-db-mak
+  - products-db-mk
   - myConfigServer
   - myDiscoveryService

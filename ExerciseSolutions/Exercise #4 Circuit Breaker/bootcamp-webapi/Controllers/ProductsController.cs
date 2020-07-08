@@ -2,7 +2,6 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-
 namespace bootcamp_webapi.Controllers
 {
     [Route("api/[controller]")]
@@ -14,7 +13,6 @@ namespace bootcamp_webapi.Controllers
         {
             _context = context;
         }
-
         // GET api/products
         [HttpGet]
         public IActionResult Get()

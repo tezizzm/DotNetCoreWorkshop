@@ -30,8 +30,6 @@ In this exercise we create a Web API application that will serve as the backend 
 
     dotnet add package Steeltoe.CloudFoundry.Connector.EFCore --version 2.4.4
 
-    dotnet add package Steeltoe.Common.Hosting --version 2.4.4
-
     dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 3.1.4
 
     dotnet add package Microsoft.EntityFrameworkCore.Design --version 3.1.4
@@ -41,7 +39,6 @@ In this exercise we create a Web API application that will serve as the backend 
 
     ```c#
     using Steeltoe.Extensions.Configuration.CloudFoundry;
-    using Steeltoe.Common.Hosting;
     ```
 
     ```c#
@@ -49,13 +46,10 @@ In this exercise we create a Web API application that will serve as the backend 
         Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseCloudHosting();
                 webBuilder.AddCloudFoundry();
                 webBuilder.UseStartup<Startup>();
             });
     ```
-
-    **Take note of the UseCloudHosting which is an extension that allows us to listen on a configured port.**
 
 6. Create a file named `Product.cs` that will serve as the entity class that represents our store's catalog of products.  The class should have four fields: Id (long), Category (string), Name (string) and Inventory (int).  When complete the class should have the following definition:
 
@@ -180,7 +174,7 @@ In this exercise we create a Web API application that will serve as the backend 
     host.Run();
     ```
 
-12. We must now create a factory class so our design time tools (Entity Framework CLI) know how to instantiate our Product Context.  For a discussion see the following [article](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation)
+12. We must now create a factory class, `ProductFactory.cs`, so that our design time tools (Entity Framework CLI) know how to instantiate our Product Context.  For a discussion see the following [article](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation)
 
     ```c#
     using Microsoft.EntityFrameworkCore;

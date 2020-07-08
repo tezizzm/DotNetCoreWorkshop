@@ -29,7 +29,7 @@ This exercise helps us understand how to register our microservices with the Spr
    2. In the CreateHostBuilder method add the following line before the `webBuilder.UseStartup<Startup>();` call to configure the service discovery client
 
         ```c#
-        webBuilder.AddDiscoveryClient();
+        webBuilder.AddServiceDiscovery();
         ```
 
 3. In the root directory navigate to the appsettings.json file and add an entry for eureka like the below snippet.  These settings tell Eureka to register our service instance with the Eureka Server
@@ -70,7 +70,7 @@ We now change focus to a front end application that discovers our products API m
 
    ***If you are running a newer version of the .NET CORE runtime, run the following command: `dotnet new globaljson --sdk-version 3.1.202`.  This command will add a global.json file with our configured SDK version to our application root.  By adding this file this will ensure the entire group is on a consistent version of the dotnet SDK.***
 
-4. Navigate to the project file and edit it to add the following nuget packages:
+4. Add the following nuget packages:
 
     ```powershell
     dotnet add package Steeltoe.Extensions.Configuration.CloudFoundryCore --version 2.4.4

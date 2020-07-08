@@ -1,5 +1,11 @@
-﻿using Microsoft.AspNetCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Steeltoe.Extensions.Configuration.CloudFoundry;
 
 namespace bootcamp_webapi
@@ -8,15 +14,17 @@ namespace bootcamp_webapi
     {
         public static void Main(string[] args)
         {
-            IWebHost webHost = CreateWebHostBuilder(args).Build();
-            webHost.EnsureMigrationOfContext<ProductContext>();
-            webHost.Run();
+            IHost host = CreateHostBuilder(args).Build();
+            host.EnsureMigrationOfContext<ProductContext>();
+            host.Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseCloudFoundryHosting()
-                .AddCloudFoundry()
-                .UseStartup<Startup>();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.AddCloudFoundry();
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
